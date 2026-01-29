@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Factory Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2 { margin-top: 40px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background-color: #f4f4f4; }
+        .card { display: inline-block; padding: 20px; margin: 10px; border: 1px solid #ccc; border-radius: 8px; width: 220px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<h1>Factory Productivity Dashboard</h1>
+
+<h2>Factory Summary</h2>
+<div id="factory-summary">
+    <div class="card">Total Productive Minutes: <span id="total-productive">0</span></div>
+    <div class="card">Total Idle Minutes: <span id="total-idle">0</span></div>
+    <div class="card">Total Units Produced: <span id="total-units">0</span></div>
+    <div class="card">Average Utilization %: <span id="avg-utilization">0</span></div>
+</div>
+
+<h2>Worker Metrics</h2>
+<table id="worker-table">
+    <thead>
+        <tr>
+            <th>Worker ID</th>
+            <th>Name</th>
+            <th>Working Minutes</th>
+            <th>Idle Minutes</th>
+            <th>Utilization %</th>
+            <th>Units Produced</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<h2>Workstation Metrics</h2>
+<table id="workstation-table">
+    <thead>
+        <tr>
+            <th>Station ID</th>
+            <th>Name</th>
+            <th>Occupancy Minutes</th>
+            <th>Utilization %</th>
+            <th>Units Produced</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+// Fetch Worker Metrics
+fetch('/api/metrics/workers/')
+.then(res => res.json())
+.then(data => {
+    const tbody = document.querySelector('#worker-table tbody');
+    data.forEach(worker => {
+        const row = `<tr>
+            <td>${worker.worker_id}</td>
+            <td>${worker.name}</td>
+            <td>${worker.working_minutes}</td>
+            <td>${worker.idle_minutes}</td>
+            <td>${worker.utilization_percent}</td>
+            <td>${worker.units_produced}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+    });
+});
+
+// Fetch Workstation Metrics
+fetch('/api/metrics/workstations/')
+.then(res => res.json())
+.then(data => {
+    const tbody = document.querySelector('#workstation-table tbody');
+    data.forEach(ws => {
+        const row = `<tr>
+            <td>${ws.station_id}</td>
+            <td>${ws.name}</td>
+            <td>${ws.occupancy_minutes}</td>
+            <td>${ws.utilization_percent}</td>
+            <td>${ws.units_produced}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+    });
+});
+
+// Fetch Factory Metrics
+fetch('/api/metrics/factory/')
+.then(res => res.json())
+.then(data => {
+    document.getElementById('total-productive').innerText = data.total_productive_minutes;
+    document.getElementById('total-idle').innerText = data.total_idle_minutes;
+    document.getElementById('total-units').innerText = data.total_units_produced;
+    document.getElementById('avg-utilization').innerText = data.average_utilization_percent;
+});
+</script>
+
+</body>
+</html>
